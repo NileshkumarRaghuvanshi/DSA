@@ -1,0 +1,298 @@
+#include <stdio.h>
+#include <malloc.h>
+
+#include "queuelib.h"
+#include "stackLib.h"
+
+
+struct myTree  {
+	int data;
+	struct myTree *left;
+	struct myTree *right;
+};
+
+struct myTree *myTreeRoot = NULL;
+
+int insertaNode(int newData, struct myTree **TempTreeNode) {
+
+	//struct myTree **TempTreeNode = inputNode;
+	
+	if(!(*TempTreeNode)) {
+	  printf("NULL so adding an element now!!!\n");
+	  *TempTreeNode = (struct myTree *)malloc(sizeof(struct myTree));
+	  if(!(*TempTreeNode)) {
+	     printf("Not able to allocate memory for the node!!!\n");
+	     return -1;
+	  }
+	  printf("Allocating data =%d\n",newData);
+	  (*TempTreeNode)->left = NULL;
+	  (*TempTreeNode)->right = NULL;
+	  (*TempTreeNode)->data = newData;
+	}
+	else if ( newData < ((*TempTreeNode)->data)) {
+	  printf("new data = %d smaller than current root = %d, so going left\n",newData,(*TempTreeNode)->data);
+	  insertaNode(newData,&(*TempTreeNode)->left);
+	}
+	else if ( newData > ((*TempTreeNode)->data)) {
+	  printf("new data = %d greater than current root = %d, so going right\n",newData,(*TempTreeNode)->data);
+	  insertaNode(newData,&(*TempTreeNode)->right);
+	  
+	}
+	
+	return 0;
+}
+
+void deleteTree(struct myTree *treeRoot) {
+  
+  if(treeRoot) {
+    deleteTree(treeRoot->left);
+    printf("Nothing on left of treeRoot->data = %d\n",treeRoot->data);
+    deleteTree(treeRoot->right);
+    printf("Nothing on right of treeRoot->data = %d\n",treeRoot->data);
+    printf("deleting treeRoot->data = %d\n",treeRoot->data);
+    free(treeRoot);
+  }
+/*
+
+    if (treeRoot->left->left == NULL && treeRoot->left->right == NULL) {
+     free(treeRoot->left);
+     treeRoot->left = NULL;
+    }
+    else {
+      deleteTree(treeRoot->left);
+      free(treeRoot);
+    }
+    
+    if (treeRoot->right->left == NULL && treeRoot->right->right == NULL) {
+      free(treeRoot->right);
+      treeRoot->right = NULL;
+    }
+    else {
+      deleteTree(treeRoot->right);
+      free(treeRoot);
+    }
+    */
+  
+}
+
+
+
+void preOrderTraverse(struct myTree *myTreeRoot) {
+
+  if(myTreeRoot) {
+    printf("%d ", myTreeRoot->data);
+    preOrderTraverse(myTreeRoot->left);
+    preOrderTraverse(myTreeRoot->right);
+  }
+  //else
+    //printf("Nothing there\n");
+}
+
+void inOrderTraversal(struct myTree *myTreeRoot) {
+ 
+  if(myTreeRoot) {
+    inOrderTraversal(myTreeRoot->left);
+    printf("%d ",myTreeRoot->data);
+    inOrderTraversal(myTreeRoot->right);
+  }
+  
+  
+}
+
+void LevelOrderTraversal(struct myTree *myTreeRoot) {
+ 
+  
+  if(myTreeRoot) {
+    struct myQueue *Q = createQueue();
+    
+    enQueue(&Q,(long)myTreeRoot);
+    
+    while(!isQueueEmpty(&Q)) {
+      struct myTree *temp = deQueue(&Q);
+      printf("%d ",temp->data);
+      
+      if(temp->left)
+	enQueue(&Q, (long)temp->left);
+      if(temp->right)
+	enQueue(&Q, (long)temp->right);
+      
+    }
+    
+    deleteQueue(&Q);
+    /*printf("%x ",myTreeRoot);
+    printf("%x ",sizeof(myTreeRoot));
+    printf("%x ",sizeof(*myTreeRoot));
+    printf("%x ",sizeof(struct myTree));
+    printf("%x ",sizeof(int));*/
+    
+    
+    
+  }
+}
+
+
+void reverseLevelOrderTraversal(struct myTree *myTreeRoot) {
+  
+  if(myTreeRoot) {
+   struct myQueue *Q = createQueue();
+   struct myStack **stacktop = creatStack();
+   
+   enQueue(&Q,(long)myTreeRoot);
+   
+   while(!isQueueEmpty(&Q)) {
+     
+     struct myTree *temp = deQueue(&Q);
+     //printf("pushing %d ",temp->data);
+     pushToStack(stacktop, temp->data);
+     
+     if(temp->left)
+       enQueue(&Q,(long)temp->left);
+     if(temp->right)
+       enQueue(&Q,(long)temp->right);
+     
+   }
+   //deleteQueue(&Q);
+   while(isStackEmpty(stacktop)) {
+     printf("%ld ",popFromStack(stacktop));
+   }
+  }
+  
+  printf("\n");
+}
+
+int searchANode(int data, struct myTree *myTreeRoot) {
+  int retVal = 0;
+  static unsigned int count = 0;
+  
+  if(myTreeRoot) {
+    printf("Count = %u\n",++count);
+    if(myTreeRoot->data == data)
+      return 1;
+    else {
+      if(retVal = searchANode(data, myTreeRoot->left))
+	return 1;
+      else
+	retVal = searchANode(data,myTreeRoot->right);
+	    
+    }
+  }
+  return retVal;
+}
+
+
+int main() {
+
+	int choice = 0;
+	do {
+
+		printf("Hello Welcome to tree programm!!!\n \
+			please select any one of these option:\n \
+			1. Insert a node.\n \
+			2. Remove a node.\n \
+			3. search a node.\n \
+			4. traverse preorder\n \
+			5. traverse postorder\n \
+			6. traverse inorder\n \
+			7. Delete a tree\n \
+			8. Level order traversal\n \
+			9. Level order in reverse way\n \
+			0. exit\n \
+			\n");
+
+		scanf("%d",&choice);	
+		switch(choice) {
+	
+			case 1: {
+
+					int newData;
+					printf("insert a node\n");
+					printf("Insert data\n");
+					scanf("%d",&newData);
+					printf("Adding data to a node %d\n",newData);
+					if(insertaNode(newData,&myTreeRoot) < 0)
+					    printf("ERROR  : inserting a node failed\n");
+					else
+					    printf("Data added sucessfully!!!\n");
+					break;
+				}
+
+			case 2: {
+					
+
+					printf("Remove a node\n");
+					break;
+				}
+
+
+			case 3: {
+
+					int data;
+					printf("Enter a data to search \n");
+					scanf("%d",&data);
+					if(searchANode(data,myTreeRoot))
+					  printf("SUCESS : Element is present in the tree!!!\n");
+					else
+					  printf("ERROR :  Element is not present in the tree!!!\n");
+					
+					break;
+				}
+
+
+			case 4: {
+					
+					printf("travse preorder\n");
+					preOrderTraverse(myTreeRoot);
+					break;
+				}
+
+
+			case 5: {
+					
+					printf("traverse post order\n");
+					break;
+				}
+
+
+			case 6: {
+					
+					printf("travese inorder\n");
+					inOrderTraversal(myTreeRoot);
+					break;
+				}
+
+			case 7: {
+					
+					printf("Deleting tree!!!\n");
+					deleteTree(myTreeRoot);
+					break;
+				}
+			case 8: {
+					
+					printf("travese LevelOrder\n");
+					LevelOrderTraversal(myTreeRoot);
+					break;
+				}
+			case 9: {
+					
+					printf("travese LevelOrder reverse\n");
+					reverseLevelOrderTraversal(myTreeRoot);
+					break;
+				}
+			case 0: {
+					
+					printf("Exiting!!!! See you again\n");
+					deleteTree(myTreeRoot);
+					break;
+				}
+			default: {
+					
+					printf("please check and select right option\n");	
+					break;
+				}
+		}
+
+	} while(choice !=0) ;
+
+
+	return 0;
+}
