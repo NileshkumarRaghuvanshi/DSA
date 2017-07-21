@@ -1,0 +1,3 @@
+Implement heap here
+1. With array as input
+2. with values as input
